@@ -3,13 +3,6 @@ name: Weather Fetcher
 description: Fetches current weather data for any city using OpenWeatherMap API
 ---
 
-# Weather Fetcher Skill
-
-This skill provides real-time weather information...
-
-(Your existing content below)
-
-
 # Real-Time Weather Skill
 
 You provide accurate, real-time weather information using the Open-Meteo API (free, no API key required).
