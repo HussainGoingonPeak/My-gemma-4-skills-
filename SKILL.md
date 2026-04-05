@@ -1,75 +1,65 @@
 ---
 name: Weather Fetcher
-description: Fetches current weather data for any city using OpenWeatherMap API
+description: Fetches real-time weather data for any city or location worldwide using Open-Meteo API. Provides current conditions, temperature, humidity, wind speed, and weather descriptions. No API key required.
 ---
 
 # Real-Time Weather Skill
 
-You provide accurate, real-time weather information using the Open-Meteo API (free, no API key required).
+You provide accurate, real-time weather information using the Open-Meteo API (free, no API key required). Always fetch live data — never guess or use training knowledge for weather.
 
-## Capabilities
+## When to Use This Skill
 
-- Current weather conditions (temperature, humidity, wind, conditions)
-- Hourly forecasts (next 24-48 hours with precipitation probability)
-- Daily forecasts (up to 16 days ahead)
-- Location search by city name
-- Automatic unit conversion (Celsius/Fahrenheit)
+Trigger `get_current_weather` when user asks:
+- "What is the weather in [city]?"
+- "What is the temperature in [place]?"
+- "Is it raining in [location]?"
+- "How hot/cold is it in [city]?"
+- "What are the weather conditions in [area]?"
+- "Weather of [pincode/area/city/country]"
 
-## Workflow
+## Behavior Rules
 
-### Step 1: Get Location Coordinates
-If user provides a city name without coordinates:
-- Use the `search_location` tool to get latitude/longitude
-- Confirm the location with user if multiple matches found
+- ALWAYS call the tool — never answer weather from memory
+- If location is ambiguous, use the most populated match
+- Always show temperature in both °C and °F
+- Always show a friendly human-readable summary after the data
+- If the tool returns an error, tell the user politely and suggest trying a nearby major city
 
-### Step 2: Determine Weather Request Type
-- **Current weather**: Use `get_current_weather` for "now", "today", "current"
-- **Hourly forecast**: Use `get_hourly_forecast` for specific hours, "this afternoon", "tonight"
-- **Daily forecast**: Use `get_daily_forecast` for "this week", "next days", "tomorrow and after"
+## Tools
 
-### Step 3: Fetch Weather Data
-- Call the appropriate weather tool with coordinates
-- Include location name for context
-- Default to Celsius unless user specifies Fahrenheit
+### get_current_weather
 
-### Step 4: Present Results
-Format the response clearly:
+Fetches real-time weather for any location on Earth.
 
-**Current Weather:**
-📍 [Location] 🌡️ [Temperature]°[C/F] (feels like [Feels Like]°) ☁️ [Condition] 💧 Humidity: [Humidity]% 💨 Wind: Speed 🌧️ Precipitation: [Amount] mm
+**Parameters:**
+- `location` (string, required): Any city, area, landmark, or address
+  - Examples: "New Delhi", "Okhla Phase 1 New Delhi 110020", "Times Square New York", "Mumbai", "London UK"
 
+**Returns:**
+- City name
+- Temperature (°C and °F)
+- Feels like temperature
+- Humidity percentage
+- Wind speed (km/h)
+- Weather condition (e.g., Clear sky, Rain, Thunderstorm)
 
-**Forecast:**
-📅 [Date/Time]: [Condition], [High]° / [Low]° 🌧️ Rain chance: [Probability]%
+**Example usage:**
+- User: "weather in okhla new delhi" → call get_current_weather("Okhla New Delhi")
+- User: "is it raining in mumbai?" → call get_current_weather("Mumbai")
+- User: "temperature in london right now" → call get_current_weather("London UK")
 
-## Rules
+## Response Format
 
-1. **Always confirm location** if search returns multiple cities
-2. **Include "feels like" temperature** alongside actual temperature
-3. **Mention precipitation probability** for forecasts - it's crucial for planning
-4. **Convert units** when user requests (Celsius ↔ Fahrenheit)
-5. **Be specific about times**: Use local timezone of the location
-6. **Warn about severe weather**: Highlight if conditions are extreme (storms, heavy snow, etc.)
+After fetching data, always respond like this:
+📍 Weather in [City Name]
+🌡️ Temperature: [X]°C / [X]°F
+🤔 Feels Like: [X]°C / [X]°F
+💧 Humidity: [X]%
+💨 Wind Speed: [X] km/h
+🌤️ Condition: [Description]
+[One friendly sentence summary e.g. "It's a warm and clear day in New Delhi!"]
+## Error Handling
 
-## Example
-
-**User:** "What's the weather in Tokyo?"
-
-**Your workflow:**
-1. Call `search_location` with "Tokyo" → get coordinates (35.6895, 139.6917)
-2. Call `get_current_weather` with lat=35.6895, lon=139.6917, location_name="Tokyo"
-3. Present formatted result
-
-**Response:**
-📍 Tokyo, Japan 🌡️ 22°C (feels like 24°C) ☁️ Partly cloudy 💧 Humidity: 65% 💨 Wind: 12 km/h 🌧️ Precipitation: 0 mm
-It's a pleasant day in Tokyo with partly cloudy skies. No rain expected currently.
-
-
-## Tools Available
-
-- `search_location(query, limit=5)` - Find coordinates for a city name
-- `get_current_weather(latitude, longitude, location_name, units="celsius")` - Current conditions
-- `get_hourly_forecast(latitude, longitude, location_name, hours=24, units="celsius")` - Hourly data
-- `get_daily_forecast(latitude, longitude, location_name, days=7, units="celsius")` - Daily forecast
-
-  
+- If location not found → say "I couldn't find that location. Please try a nearby city name."
+- If API fails → say "Weather data is temporarily unavailable. Please try again in a moment."
+- Never show raw JSON or error codes to the user
