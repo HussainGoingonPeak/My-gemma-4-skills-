@@ -1,7 +1,14 @@
 ---
-name: realtime-weather
-description: Get real-time weather data for any location worldwide using Open-Meteo API. Provides current conditions, hourly forecasts, and daily predictions. Use when user asks about weather, temperature, rain, wind, forecasts, or atmospheric conditions. Trigger phrases include "what's the weather", "will it rain", "forecast for", "temperature in", "weather today".
+name: Weather Fetcher
+description: Fetches current weather data for any city using OpenWeatherMap API
 ---
+
+# Weather Fetcher Skill
+
+This skill provides real-time weather information...
+
+(Your existing content below)
+
 
 # Real-Time Weather Skill
 
